@@ -10,7 +10,16 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Random;
 
-import pkgEnum.ePuzzleViolation;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import pkgEnum.*;
 import pkgHelper.LatinSquare;
 import pkgHelper.PuzzleViolation;
  
@@ -46,6 +55,8 @@ public class Sudoku extends LatinSquare implements Serializable {
 	private int iSqrtSize;
 
 	private HashMap<Integer, SudokuCell> cells = new HashMap<Integer, SudokuCell>();
+	
+	private eGameDifficulty eGameDifficulty;
 	
 	/**
 	 * Sudoku - for Lab #2... do the following:
@@ -102,6 +113,17 @@ public class Sudoku extends LatinSquare implements Serializable {
 
 	}
 
+	private Sudoku() {
+		eGameDifficulty = eGameDifficulty.EASY;
+	}
+	
+	public Sudoku(int iSize, eGameDifficulty eGD) throws Exception {
+		this(iSize);
+		eGameDifficulty = eGD;
+		
+		RemoveCells();
+		
+	}
 	
 	/**
 	 * getiSize - the UI needs to know the size of the puzzle
@@ -179,7 +201,25 @@ public class Sudoku extends LatinSquare implements Serializable {
 	 */
 	private HashSet<Integer> getAllValidCellValues(int iCol, int iRow) {
 
-		HashSet<Integer> hsCellRange = new HashSet<Integer>();
+HashSet<Integer> hs = new HashSet<Integer>();
+		
+		if (getPuzzle()[iRow][iCol] != 0) {
+			hs.add(getPuzzle()[iRow][iCol]);
+		} 
+		else {
+			for (int i = 1;i<=iSize;i++) {
+				hs.add(i);
+			}
+			
+			for (int j = 0;j<iSize;j++) {
+				hs.remove((Integer)this.getRow(iRow)[j]);
+				hs.remove((Integer)this.getColumn(iCol)[j]);
+				hs.remove((Integer)this.getRegion(iCol,iRow)[j]);
+			}
+		}
+		return hs;
+		
+		/*HashSet<Integer> hsCellRange = new HashSet<Integer>();
 		for (int i = 0; i < iSize; i++) {
 			hsCellRange.add(i + 1);
 		}
@@ -189,7 +229,7 @@ public class Sudoku extends LatinSquare implements Serializable {
 		Collections.addAll(hsUsedValues, Arrays.stream(this.getRegion(iCol, iRow)).boxed().toArray(Integer[]::new));
 
 		hsCellRange.removeAll(hsUsedValues);
-		return hsCellRange;
+		return hsCellRange;*/
 	}
 
 	/**
@@ -572,7 +612,51 @@ public class Sudoku extends LatinSquare implements Serializable {
 		}
 	}
 	
+	//new methods
+	
+	private void RemoveCells() throws Exception {
+		do {
+			SecureRandom random = new SecureRandom();
+			getPuzzle()[random.nextInt(iSize)][random.nextInt(iSize)] = 0;
+			SetRemainingCells();
 		
+		} while (IsDifficultyMet(PossibleValuesMultiplier(cells)) == false);
+	}
+	
+	private boolean IsDifficultyMet(int iPossibleValues) {
+		return eGameDifficulty.getiDifficulty() <= iPossibleValues;
+		 
+	}
+	
+	private void SetRemainingCells() {
+		
+		for(int iRow = 0; iRow < iSize; iRow++) {
+			for(int iCol = 0; iCol < iSize; iCol++) {
+				SudokuCell newCell = new SudokuCell(iRow, iCol);
+				newCell.setlstRemainingValidValues(getAllValidCellValues(iCol,iRow));
+				
+				cells.put(newCell.hashCode(), newCell);
+				
+			}
+		}
+		
+		
+	}
+	
+	private static int PossibleValuesMultiplier(HashMap<Integer,Sudoku.SudokuCell> cells) throws Exception {
+		int posValues = 1;
+		
+		for (SudokuCell c : cells.values()) {
+			posValues *= c.getlstRemainingValidValues().size();
+		}
+		if (posValues > Integer.MAX_VALUE) {
+			return Integer.MAX_VALUE;
+		}
+		return posValues;
+		
+	}
+	
+	
 	/**
 	 * Cell - private class that handles possible remaining values
 	 * 
@@ -586,6 +670,7 @@ public class Sudoku extends LatinSquare implements Serializable {
 		private int iRow;
 		private int iCol;
 		private ArrayList<Integer> lstValidValues = new ArrayList<Integer>();
+		private ArrayList<Integer> lstRemainingValidValues = new ArrayList<Integer>();
 
 		public SudokuCell(int iRow, int iCol) {
 			super(iRow, iCol);
@@ -657,6 +742,14 @@ public class Sudoku extends LatinSquare implements Serializable {
 
 			return (SudokuCell)cells.get(Objects.hash(iRow,iCol));		
 
+		}
+		
+		public ArrayList<Integer> getlstRemainingValidValues() {
+			return lstRemainingValidValues;
+		}
+		
+		public void setlstRemainingValidValues(HashSet<Integer> hsRemainingValues) {
+			lstRemainingValidValues = new ArrayList<Integer>(hsRemainingValues);
 		}
 	}
 }

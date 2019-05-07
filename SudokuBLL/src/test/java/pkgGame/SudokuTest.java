@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import pkgEnum.*;
 
 import org.junit.Test;
 
@@ -121,9 +122,9 @@ public class SudokuTest {
 			fail("Test failed to build a Sudoku");
 		}
 
-	}*/
+	}
 
-
+	
 	@Test
 	public void Sudoku_FullPuzzle_1()
 	{
@@ -136,6 +137,55 @@ public class SudokuTest {
 			fail("Test failed to build a Sudoku");
 		}
 	}
+	*/
+	@Test
+	public void Sudoku_FullPuzzle_2()
+	{
+		try {
+			Sudoku s1 = new Sudoku(9,eGameDifficulty.EASY);
+			System.out.println("Easy Sudoku:");
+			s1.PrintPuzzle();
+			assertFalse(s1.isSudoku());
+			assertTrue(s1.isPartialSudoku());
+
+		} catch (Exception e) {
+			fail("Test failed to build a Sudoku");
+		}
+	}
+	
+	@Test
+	public void Sudoku_FullPuzzle_3()
+	{
+		try {
+			Sudoku s1 = new Sudoku(9,eGameDifficulty.MEDIUM);
+			System.out.println("Medium Sudoku:");
+			s1.PrintPuzzle();
+			assertFalse(s1.isSudoku());
+			assertTrue(s1.isPartialSudoku());
+
+		} catch (Exception e) {
+			fail("Test failed to build a Sudoku");
+		}
+	}
+	
+	
+
+	@Test
+	public void Sudoku_FullPuzzle_4()
+	{
+		try {
+			Sudoku s1 = new Sudoku(9,eGameDifficulty.HARD);
+			System.out.println("Hard Sudoku:");
+			s1.PrintPuzzle();
+			assertFalse(s1.isSudoku());
+			assertTrue(s1.isPartialSudoku());
+
+		} catch (Exception e) {
+			fail("Test failed to build a Sudoku");
+		}
+	}
+	
+
 
 
 

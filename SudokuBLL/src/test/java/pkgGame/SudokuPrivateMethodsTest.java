@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -124,4 +125,10 @@ public class SudokuPrivateMethodsTest {
 		}
 
 	}
+	
+	
+	
+	
+	
+	
 }
